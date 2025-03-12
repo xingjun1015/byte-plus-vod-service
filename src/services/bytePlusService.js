@@ -3,21 +3,37 @@ const crypto = require("crypto");
 const axios = require("axios");
 
 class BytePlusService {
-  constructor({}) {}
+  constructor({ bytePlusVodService }) {
+    this.bytePlusVodService = bytePlusVodService;
+  }
+
+  async getBytePlusInfo() {
+    try {
+      const region = process.env.BYTEPLUS_REGION;
+      const appId = process.env.BYTEPLUS_APP_ID;
+      const spaceName = process.env.BYTEPLUS_VOD_SPACE_NAME;
+      const userId = process.env.BYTEPLUS_VOD_USER_ID;
+
+      return {
+        success: true,
+        data: {
+          region,
+          appId,
+          spaceName,
+          userId,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        success: false,
+        message: "Failed to get BytePlus info",
+      };
+    }
+  }
 
   async getVideoAuthToken({ vid }) {
     try {
-      const bytePlusAccessKey = process.env.BYTEPLUS_ACCESSKEY;
-      const bytePlusSecretKey = process.env.BYTEPLUS_SECRETKEY;
-
-      if (!bytePlusAccessKey || !bytePlusSecretKey) {
-        throw new Error("BytePlus access key and secret key are required");
-      }
-
-      const vodService = vodOpenapi.defaultService;
-      vodService.setAccessKeyId(bytePlusAccessKey);
-      vodService.setSecretKey(bytePlusSecretKey);
-
       const tokenExpireTime = 3600; // Token expiration time in seconds, default is 3600 (1 hour)
 
       const query = {
@@ -28,7 +44,7 @@ class BytePlusService {
         Codec: "h264",
         Ssl: 0, // Indicates whether to return HTTPS address. 1: true, 0: false
       };
-      const res = vodService.GetPlayAuthToken(query, tokenExpireTime);
+      const res = this.bytePlusVodService.GetPlayAuthToken(query, tokenExpireTime);
 
       return {
         success: true,
@@ -48,19 +64,8 @@ class BytePlusService {
 
   async getMediaList() {
     try {
-      const bytePlusAccessKey = process.env.BYTEPLUS_ACCESSKEY;
-      const bytePlusSecretKey = process.env.BYTEPLUS_SECRETKEY;
-
-      if (!bytePlusAccessKey || !bytePlusSecretKey) {
-        throw new Error("BytePlus access key and secret key are required");
-      }
-
-      const vodService = vodOpenapi.defaultService;
-      vodService.setAccessKeyId(bytePlusAccessKey);
-      vodService.setSecretKey(bytePlusSecretKey);
-
-      const res = await vodService.GetMediaList({
-        SpaceName: "vod-testing",
+      const res = await this.bytePlusVodService.GetMediaList({
+        SpaceName: process.env.BYTEPLUS_VOD_SPACE_NAME,
         Status: "Published",
         // Vid: "string",
         // Order: "string",
@@ -97,6 +102,27 @@ class BytePlusService {
       return {
         success: false,
         message: "Failed to get video auth token",
+      };
+    }
+  }
+
+  async getUploadToken() {
+    try {
+      const tokenExpireTime = 30 * 60 * 1000; // 30minutes
+      const uploadToken = this.bytePlusVodService.GetUploadToken(tokenExpireTime);
+
+      return {
+        success: true,
+        data: {
+          token: uploadToken,
+          expires: tokenExpireTime,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        success: false,
+        message: "Failed to get upload token",
       };
     }
   }

@@ -22,6 +22,24 @@ class BytePlusController {
       res.status(400).send(this.errorResponseMessage.serverError(response.message));
     }
   }
+
+  async getBytePlusInfo(req, res) {
+    const response = await this.bytePlusService.getBytePlusInfo();
+    if (response.success) {
+      res.status(200).send(response);
+    } else {
+      res.status(400).send(this.errorResponseMessage.serverError(response.message));
+    }
+  }
+
+  async getUploadToken(req, res) {
+    const response = await this.bytePlusService.getUploadToken();
+    if (response.success) {
+      res.status(200).send(response);
+    } else {
+      res.status(400).send(this.errorResponseMessage.serverError(response.message));
+    }
+  }
 }
 
 module.exports = BytePlusController;
