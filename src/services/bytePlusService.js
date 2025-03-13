@@ -73,7 +73,7 @@ class BytePlusService {
       return {
         success: true,
         data: {
-          res: res,
+          url: res.Result.PlayInfoList[0].MainPlayUrl,
         },
       };
     } catch (error) {
