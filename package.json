@@ -5,6 +5,8 @@
     "scripts": {
         "start": "node index.js || node src/index.js",
         "dev": "nodemon src/index.js",
+        "dev:port": "set PORT=%npm_config_port% && nodemon src/index.js",
+        "dev:ngrok": "npm run dev:port --port=80",
         "test": "echo \"Error: no test specified\" && exit 1",
         "create-migration": "node src/scripts/createMigration.js"
     },

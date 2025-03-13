@@ -1,0 +1,22 @@
+@base_url = http://localhost:4000/api/byteplus
+@basic = Basic dXNlcm5hbWU6cGFzc3dvcmQ=
+
+### Get BytePlus Info
+GET {{base_url}}/info
+Authorization: {{basic}}
+
+### Get Media List
+GET {{base_url}}/medias
+Authorization: {{basic}}
+
+### Get Video Auth Token
+GET {{base_url}}/token/v112d5g50000cv8lvi7ak5vcrcp0hnjg
+Authorization: {{basic}}
+
+### Get Video Playback URL
+GET {{base_url}}/url/v112d5g50000cv8lvi7ak5vcrcp0hnjg
+Authorization: {{basic}}
+
+### Get Upload Token
+GET {{base_url}}/upload-token
+Authorization: {{basic}}

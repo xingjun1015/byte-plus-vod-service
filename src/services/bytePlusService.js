@@ -7,6 +7,16 @@ class BytePlusService {
     this.bytePlusVodService = bytePlusVodService;
   }
 
+  getQueryObject(vid) {
+    return {
+      Vid: vid, // The video ID from the BytePlus VOD service
+      FileType: "video", // Default is video. Supports: video, audio, evideo (for encrypted video), eaudio (for encrypted audio)
+      Definition: "All", // Applicable when FileType is video and evideo. Supports: 240p, 360p, 480p, 540p, 720p, 1080p, 2k, 4k. All by default.
+      Codec: "h264",
+      Ssl: 1, // Indicates whether to return HTTPS address. 1: true, 0: false
+    };
+  }
+
   async getBytePlusInfo() {
     try {
       const region = process.env.BYTEPLUS_REGION;
@@ -36,14 +46,7 @@ class BytePlusService {
     try {
       const tokenExpireTime = 3600; // Token expiration time in seconds, default is 3600 (1 hour)
 
-      const query = {
-        Vid: vid, // The video ID from the BytePlus VOD service
-        FileType: "video", // Default is video. Supports: video, audio, evideo (for encrypted video), eaudio (for encrypted audio)
-        Definition: "All", // Applicable when FileType is video and evideo. Supports: 240p, 360p, 480p, 540p, 720p, 1080p, 2k, 4k. All by default.
-        Format: "your format",
-        Codec: "h264",
-        Ssl: 0, // Indicates whether to return HTTPS address. 1: true, 0: false
-      };
+      const query = this.getQueryObject(vid);
       const res = this.bytePlusVodService.GetPlayAuthToken(query, tokenExpireTime);
 
       return {
@@ -51,6 +54,26 @@ class BytePlusService {
         data: {
           token: res,
           expires: tokenExpireTime,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        success: false,
+        message: "Failed to get video auth token",
+      };
+    }
+  }
+
+  async getVideoPlaybackUrl({ vid }) {
+    try {
+      const query = this.getQueryObject(vid);
+      const res = await this.bytePlusVodService.GetPlayInfo(query);
+
+      return {
+        success: true,
+        data: {
+          res: res,
         },
       };
     } catch (error) {
